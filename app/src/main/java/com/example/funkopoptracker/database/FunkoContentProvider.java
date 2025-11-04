@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 
 public class FunkoContentProvider extends ContentProvider {
 
-    public static final String TABLE_NAME = "funkoTab;e";
+    public static final String TABLE_NAME = "funkoTable";
     public static final String DB_NAME = "funkoDB";
 
     public static final String COL_NAME = "NAME";
