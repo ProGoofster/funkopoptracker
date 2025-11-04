@@ -9,14 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FunkoPop {
-    private String name;
-    private int number;
-    private int rarity;
-    private String picture;
+    private final String name;
+    private final int number;
+    private final int rarity;
+    private final String picture;
 
     public FunkoPop(String name, int number) {
         this.name = name;
         this.number = number;
+        rarity = 0;
+        picture = null;
     }
 
     public FunkoPop(String name, int number, int rarity, String picture) {

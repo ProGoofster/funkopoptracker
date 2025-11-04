@@ -32,7 +32,7 @@ public class AddPopFragment extends Fragment {
             FunkoPop newPop = new FunkoPop(name, number);
 
             //database stuff would happen here to save newPop
-            getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI, newPop.toContentValues());
+            getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_OWNED, newPop.toContentValues());
 
             //toast
             String toastText = "FunkoPop: " + newPop.getName() + ", " + newPop.getNumber() + " added to DataBase (not really).";

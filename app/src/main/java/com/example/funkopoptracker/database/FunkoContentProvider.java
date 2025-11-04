@@ -13,16 +13,19 @@ import androidx.annotation.Nullable;
 
 public class FunkoContentProvider extends ContentProvider {
 
-    public static final String TABLE_NAME = "funkoTable";
+    // Table names
+    public static final String TABLE_OWNED = "funkoOwnedTable";
+    public static final String TABLE_WISHLIST = "funkoWishlistTable";
     public static final String DB_NAME = "funkoDB";
 
+    // Column names (same for both tables)
     public static final String COL_NAME = "NAME";
     public static final String COL_NUMBER = "NUMBER";
     public static final String COL_RARITY = "RARITY";
     public static final String COL_PICTURE = "PICTURE";
 
-
-    public final static String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
+    // SQL Create statements
+    public final static String SQL_CREATE_OWNED = "CREATE TABLE " + TABLE_OWNED + " (" +
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_NAME + " TEXT, " +
             COL_NUMBER + " INTEGER, " +
@@ -30,32 +33,58 @@ public class FunkoContentProvider extends ContentProvider {
             COL_PICTURE + " TEXT " +
             ")";
 
+    public final static String SQL_CREATE_WISHLIST = "CREATE TABLE " + TABLE_WISHLIST + " (" +
+            "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COL_NAME + " TEXT, " +
+            COL_NUMBER + " INTEGER, " +
+            COL_RARITY + " INTEGER, " +
+            COL_PICTURE + " TEXT " +
+            ")";
 
-    public static final Uri CONTENT_URI = Uri.parse("content://com.example.funkotracker.provider");
+    // Separate URIs for each table
+    public static final Uri CONTENT_URI_OWNED = Uri.parse("content://com.example.funkotracker.provider/owned");
+    public static final Uri CONTENT_URI_WISHLIST = Uri.parse("content://com.example.funkotracker.provider/wishlist");
 
     MainDatabaseHelper mHelper;
 
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
-
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 1);
+            super(context, DB_NAME, null, 2); // Increment version to 2
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL(SQL_CREATE);
+            db.execSQL(SQL_CREATE_OWNED);
+            db.execSQL(SQL_CREATE_WISHLIST);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+            if (oldVersion < 2) {
+                // Rename old table to owned table
+                db.execSQL("ALTER TABLE funkoTable RENAME TO " + TABLE_OWNED);
+                // Create new wishlist table
+                db.execSQL(SQL_CREATE_WISHLIST);
+            }
         }
+    }
+
+    private String getTableName(Uri uri) {
+        String path = uri.getPath();
+        if (path.contains("wishlist")) {
+            return TABLE_WISHLIST;
+        } else if (path.contains("owned")) {
+            return TABLE_OWNED;
+        }
+        // Default to owned for backward compatibility
+        return TABLE_OWNED;
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return mHelper.getWritableDatabase().delete(TABLE_NAME, selection, selectionArgs);
+        String tableName = getTableName(uri);
+        return mHelper.getWritableDatabase().delete(tableName, selection, selectionArgs);
     }
 
     @Nullable
@@ -67,9 +96,9 @@ public class FunkoContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-
-        long id = mHelper.getWritableDatabase().insert(TABLE_NAME, null, values);
-        return uri.withAppendedPath(uri, id + "");
+        String tableName = getTableName(uri);
+        long id = mHelper.getWritableDatabase().insert(tableName, null, values);
+        return Uri.withAppendedPath(uri, id + "");
     }
 
     @Override
@@ -81,12 +110,14 @@ public class FunkoContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        return mHelper.getReadableDatabase().query(TABLE_NAME, projection, selection,
+        String tableName = getTableName(uri);
+        return mHelper.getReadableDatabase().query(tableName, projection, selection,
                 selectionArgs, null, null, sortOrder);
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        String tableName = getTableName(uri);
+        return mHelper.getWritableDatabase().update(tableName, values, selection, selectionArgs);
     }
 }

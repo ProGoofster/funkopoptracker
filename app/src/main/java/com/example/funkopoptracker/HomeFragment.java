@@ -24,7 +24,7 @@ public class HomeFragment extends Fragment {
 
         List<FunkoPop> funkoPops = new ArrayList<>();
 
-        Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_OWNED, null, null, null, null);
 
         funkoPops.addAll(FunkoPop.allFromCursor(cursor));
 
