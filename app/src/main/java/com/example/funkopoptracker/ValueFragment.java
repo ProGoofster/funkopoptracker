@@ -1,5 +1,6 @@
 package com.example.funkopoptracker;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
+
+import com.example.funkopoptracker.database.FunkoContentProvider;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +26,13 @@ public class ValueFragment extends Fragment {
 
         List<FunkoPop> funkoPops = new ArrayList<>();
 
-        //sample funko pops with values
-        funkoPops.add(new FunkoPop("Baby Yoda", "#368"));
-        funkoPops.add(new FunkoPop("Iron Man", "#285"));
-        funkoPops.add(new FunkoPop("Spider-Man", "#593"));
+        Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI, null, null, null, null);
+        funkoPops.addAll(FunkoPop.allFromCursor(cursor));
 
         int totalValue = funkoPops.size() * 50;//debug - all values set to 50 rn
         totalValueText.setText("Total Value: $" + totalValue);
+
+
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),

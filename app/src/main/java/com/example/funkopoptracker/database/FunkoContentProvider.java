@@ -27,7 +27,7 @@ public class FunkoContentProvider extends ContentProvider {
             COL_NAME + " TEXT, " +
             COL_NUMBER + " INTEGER, " +
             COL_RARITY + " INTEGER, " +
-            COL_PICTURE + " TEXT, " +
+            COL_PICTURE + " TEXT " +
             ")";
 
 

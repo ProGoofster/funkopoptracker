@@ -21,9 +21,9 @@ public class WishlistFragment extends Fragment {
         List<FunkoPop> wishlistPops = new ArrayList<>();
 
         //fake funko pops to populate wishlist
-        wishlistPops.add(new FunkoPop("Darth Vader", "#01"));
-        wishlistPops.add(new FunkoPop("Groot", "#49"));
-        wishlistPops.add(new FunkoPop("Deadpool", "#111"));
+        wishlistPops.add(new FunkoPop("Darth Vader", 1));
+        wishlistPops.add(new FunkoPop("Groot", 49));
+        wishlistPops.add(new FunkoPop("Deadpool", 111));
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),

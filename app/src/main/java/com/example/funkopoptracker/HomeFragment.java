@@ -1,5 +1,6 @@
 package com.example.funkopoptracker;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import androidx.fragment.app.Fragment;
+
+import com.example.funkopoptracker.database.FunkoContentProvider;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +24,9 @@ public class HomeFragment extends Fragment {
 
         List<FunkoPop> funkoPops = new ArrayList<>();
 
-        //fake funko pops to populate listview on home page
-        funkoPops.add(new FunkoPop("Baby Yoda", "#368"));
-        funkoPops.add(new FunkoPop("Iron Man", "#285"));
-        funkoPops.add(new FunkoPop("Spider-Man", "#593"));
+        Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI, null, null, null, null);
+
+        funkoPops.addAll(FunkoPop.allFromCursor(cursor));
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
@@ -39,7 +42,7 @@ public class HomeFragment extends Fragment {
                 android.widget.TextView popNumberText = view.findViewById(android.R.id.text2);
                 FunkoPop funkoPop = getItem(position);
                 popNameText.setText(funkoPop.getName());
-                popNumberText.setText(funkoPop.getNumber());
+                popNumberText.setText(funkoPop.getNumberString());
                 return view;
             }
         };

@@ -26,7 +26,8 @@ public class AddPopFragment extends Fragment {
 
         buttonAdd.setOnClickListener(v -> {
             String name = editTextName.getText().toString();
-            String number = editTextNumber.getText().toString();
+            String numberText = editTextNumber.getText().toString();
+            int number = Integer.parseInt(numberText);
 
             FunkoPop newPop = new FunkoPop(name, number);
 
