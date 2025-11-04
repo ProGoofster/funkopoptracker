@@ -16,20 +16,20 @@ public class FunkoContentProvider extends ContentProvider {
     public static final String TABLE_NAME = "funkoTab;e";
     public static final String DB_NAME = "funkoDB";
 
+    public static final String COL_NAME = "NAME";
+    public static final String COL_NUMBER = "NUMBER";
+    public static final String COL_RARITY = "RARITY";
+    public static final String COL_PICTURE = "PICTURE";
+
+
     public final static String SQL_CREATE = "CREATE TABLE " + TABLE_NAME + " (" +
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-//            Examples (based on pokemon homework):
-//            COL_NATNUM + " INTEGER, " +
-//            COL_NAME + " TEXT, " +
-//            COL_SPECIES + " TEXT, " +
-//            COL_GENDER + " TEXT, " +
-//            COL_HEIGHT + " REAL, " +
-//            COL_WEIGHT + " REAL, " +
-//            COL_LEVEL + " INTEGER, " +
-//            COL_HP + " INTEGER, " +
-//            COL_ATTACK + " INTEGER, " +
-//            COL_DEFENSE + " INTEGER" +
+            COL_NAME + " TEXT, " +
+            COL_NUMBER + " INTEGER, " +
+            COL_RARITY + " INTEGER, " +
+            COL_PICTURE + " TEXT, " +
             ")";
+
 
     public static final Uri CONTENT_URI = Uri.parse("content://com.example.funkotracker.provider");
 
@@ -67,7 +67,7 @@ public class FunkoContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-//        String columnExample = values.getAsString(COL_);
+
         long id = mHelper.getWritableDatabase().insert(TABLE_NAME, null, values);
         return uri.withAppendedPath(uri, id + "");
     }
