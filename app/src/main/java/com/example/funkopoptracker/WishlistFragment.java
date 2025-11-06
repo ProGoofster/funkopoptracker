@@ -1,5 +1,6 @@
 package com.example.funkopoptracker;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import androidx.fragment.app.Fragment;
+
+import com.example.funkopoptracker.database.FunkoContentProvider;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,18 +22,18 @@ public class WishlistFragment extends Fragment {
 
         ListView listView = view.findViewById(R.id.wishlistListView);
 
-        List<FunkoPop> wishlistPops = new ArrayList<>();
 
-        //fake funko pops to populate wishlist
-        wishlistPops.add(new FunkoPop("Darth Vader", 1));
-        wishlistPops.add(new FunkoPop("Groot", 49));
-        wishlistPops.add(new FunkoPop("Deadpool", 111));
+        List<FunkoPop> funkoPopsWishlist = new ArrayList<>();
+
+        Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_WISHLIST, null, null, null, null);
+
+        funkoPopsWishlist.addAll(FunkoPop.allFromCursor(cursor));
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
             android.R.layout.simple_list_item_2,
             android.R.id.text1,
-            wishlistPops
+                funkoPopsWishlist
         ) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
