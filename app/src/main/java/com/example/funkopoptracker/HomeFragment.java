@@ -49,6 +49,17 @@ public class HomeFragment extends Fragment {
 
         listView.setAdapter(adapter);
 
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            FunkoPop selectedPop = funkoPops.get(position);
+            ViewPopFragment viewPopFragment = ViewPopFragment.newInstance(selectedPop);
+
+            requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, viewPopFragment)
+                .addToBackStack(null)
+                .commit();
+        });
+
         return view;
     }
 }
