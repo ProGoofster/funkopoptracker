@@ -21,7 +21,7 @@ public class FunkoContentProvider extends ContentProvider {
     // Column names (same for both tables)
     public static final String COL_NAME = "NAME";
     public static final String COL_NUMBER = "NUMBER";
-    public static final String COL_RARITY = "RARITY";
+    public static final String COL_PRICE = "PRICE";
     public static final String COL_PICTURE = "PICTURE";
 
     // SQL Create statements
@@ -29,7 +29,7 @@ public class FunkoContentProvider extends ContentProvider {
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_NAME + " TEXT, " +
             COL_NUMBER + " INTEGER, " +
-            COL_RARITY + " INTEGER, " +
+            COL_PRICE + " REAL, " +
             COL_PICTURE + " TEXT " +
             ")";
 
@@ -37,7 +37,7 @@ public class FunkoContentProvider extends ContentProvider {
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_NAME + " TEXT, " +
             COL_NUMBER + " INTEGER, " +
-            COL_RARITY + " INTEGER, " +
+            COL_PRICE + " REAL, " +
             COL_PICTURE + " TEXT " +
             ")";
 
@@ -50,7 +50,7 @@ public class FunkoContentProvider extends ContentProvider {
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 2); // Increment version to 2
+            super(context, DB_NAME, null, 4);
         }
 
         @Override
@@ -61,12 +61,11 @@ public class FunkoContentProvider extends ContentProvider {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion < 2) {
-                // Rename old table to owned table
-                db.execSQL("ALTER TABLE funkoTable RENAME TO " + TABLE_OWNED);
-                // Create new wishlist table
-                db.execSQL(SQL_CREATE_WISHLIST);
-            }
+            // Drop old tables and recreate with new schema
+            db.execSQL("DROP TABLE IF EXISTS funkoTable");
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_OWNED);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_WISHLIST);
+            onCreate(db);
         }
     }
 

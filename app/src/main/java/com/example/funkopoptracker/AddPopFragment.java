@@ -119,11 +119,11 @@ public class AddPopFragment extends Fragment {
                 imagePath = saveImageToInternalStorage(selectedImageUri, name + "_" + number);
             }
 
-            int rarity = 0;
+            double price = 0.0;
 
-            //TODO: implement seeded-weighted rarity generated from number
+            //TODO: implement price input and rarity generation from price
 
-            FunkoPop newPop = new FunkoPop(name, number, rarity, imagePath);
+            FunkoPop newPop = new FunkoPop(name, number, price, imagePath);
 
             //database stuff
             getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_OWNED, newPop.toContentValues());
