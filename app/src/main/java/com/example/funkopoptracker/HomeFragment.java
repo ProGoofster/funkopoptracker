@@ -30,20 +30,43 @@ public class HomeFragment extends Fragment {
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
-            android.R.layout.simple_list_item_2,
-            android.R.id.text1,
+            R.layout.list_item_funko_pop,
             funkoPops
         ) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                //simple_list_item_2 has text1 for title and text2 for subtitle
-                android.widget.TextView popNameText = view.findViewById(android.R.id.text1);
-                android.widget.TextView popNumberText = view.findViewById(android.R.id.text2);
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_funko_pop, parent, false);
+                }
+
+                android.widget.TextView popNameText = convertView.findViewById(R.id.txtFunkoPopName);
+                android.widget.TextView popNumberText = convertView.findViewById(R.id.txtFunkoPopNumber);
+                android.widget.ImageView imgThumbnail = convertView.findViewById(R.id.imgFunkoPopThumbnail);
+
                 FunkoPop funkoPop = getItem(position);
                 popNameText.setText(funkoPop.getName());
                 popNumberText.setText(funkoPop.getNumberString());
-                return view;
+
+                // Load image if available
+                String picturePath = funkoPop.getPicture();
+                if (picturePath != null && !picturePath.isEmpty()) {
+                    try {
+                        android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(picturePath);
+                        if (bitmap != null) {
+                            imgThumbnail.setImageBitmap(bitmap);
+                            imgThumbnail.setVisibility(View.VISIBLE);
+                        } else {
+                            imgThumbnail.setVisibility(View.GONE);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        imgThumbnail.setVisibility(View.GONE);
+                    }
+                } else {
+                    imgThumbnail.setVisibility(View.GONE);
+                }
+
+                return convertView;
             }
         };
 

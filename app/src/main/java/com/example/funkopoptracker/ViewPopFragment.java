@@ -4,11 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
+
+import com.example.funkopoptracker.database.FunkoContentProvider;
 
 public class ViewPopFragment extends Fragment {
     private static final String ARG_NAME = "name";
@@ -18,7 +21,6 @@ public class ViewPopFragment extends Fragment {
 
     private String name;
     private int number;
-    private int rarity;
     private String picture;
 
     public static ViewPopFragment newInstance(FunkoPop funkoPop) {
@@ -26,7 +28,6 @@ public class ViewPopFragment extends Fragment {
         Bundle args = new Bundle();
         args.putString(ARG_NAME, funkoPop.getName());
         args.putInt(ARG_NUMBER, funkoPop.getNumber());
-        args.putInt(ARG_RARITY, funkoPop.getRarity());
         args.putString(ARG_PICTURE, funkoPop.getPicture());
         fragment.setArguments(args);
         return fragment;
@@ -38,7 +39,6 @@ public class ViewPopFragment extends Fragment {
         if (getArguments() != null) {
             name = getArguments().getString(ARG_NAME);
             number = getArguments().getInt(ARG_NUMBER);
-            rarity = getArguments().getInt(ARG_RARITY);
             picture = getArguments().getString(ARG_PICTURE);
         }
     }
@@ -53,22 +53,48 @@ public class ViewPopFragment extends Fragment {
             requireActivity().getSupportFragmentManager().popBackStack();
         });
 
+        //Setup delete button
+        Button btnDelete = view.findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(v -> {
+            // Delete the entry from the database using name and number as selection criteria
+            String selection = FunkoContentProvider.COL_NAME + " = ? AND " + FunkoContentProvider.COL_NUMBER + " = ?";
+            String[] selectionArgs = new String[]{name, String.valueOf(number)};
+
+            int deletedRows = getActivity().getContentResolver().delete(
+                FunkoContentProvider.CONTENT_URI_OWNED,
+                selection,
+                selectionArgs
+            );
+
+            if (deletedRows > 0) {
+                android.widget.Toast.makeText(getContext(), "Funko Pop deleted", android.widget.Toast.LENGTH_SHORT).show();
+                // Navigate back after deletion
+                requireActivity().getSupportFragmentManager().popBackStack();
+            } else {
+                android.widget.Toast.makeText(getContext(), "Failed to delete", android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Populate the views with data
         TextView tvFunkoName = view.findViewById(R.id.tvFunkoName);
         TextView tvFunkoNumber = view.findViewById(R.id.tvFunkoNumber);
-        RatingBar ratingBarRarity = view.findViewById(R.id.ratingBarRarity);
-        TextView tvRarityValue = view.findViewById(R.id.tvRarityValue);
         ImageView imgFunkoPop = view.findViewById(R.id.imgFunkoPop);
+        View cardViewImage = view.findViewById(R.id.cardViewImage);
 
         tvFunkoName.setText(name);
         tvFunkoNumber.setText("#" + number);
-        ratingBarRarity.setRating(rarity);
-        tvRarityValue.setText("(" + rarity + ".0)");
 
-        // TODO: Load image from picture URL if available
-        // For now, you can implement image loading later
+        // Load image from internal storage if available
         if (picture != null && !picture.isEmpty()) {
-            // Load image using Glide, Picasso, or similar library
+            try {
+                android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeFile(picture);
+                if (bitmap != null) {
+                    imgFunkoPop.setImageBitmap(bitmap);
+                    cardViewImage.setVisibility(View.VISIBLE); // Show the card view when image is available
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return view;
