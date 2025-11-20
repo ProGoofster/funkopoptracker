@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -73,6 +74,7 @@ public class AddPopFragment extends Fragment {
 
         EditText editTextName = view.findViewById(R.id.editTextName);
         EditText editTextNumber = view.findViewById(R.id.editTextNumber);
+        CheckBox checkBoxWishlist = view.findViewById(R.id.checkBoxWishlist);
         imageViewPreview = view.findViewById(R.id.imageViewPreview);
         Button buttonTakePhoto = view.findViewById(R.id.buttonTakePhoto);
         Button buttonSelectImage = view.findViewById(R.id.buttonSelectImage);
@@ -126,15 +128,19 @@ public class AddPopFragment extends Fragment {
             FunkoPop newPop = new FunkoPop(name, number, rarity, imagePath, price);
 
             //database stuff
-            getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_OWNED, newPop.toContentValues());
+            boolean isWishlist = checkBoxWishlist.isChecked();
+            Uri contentUri = isWishlist ? FunkoContentProvider.CONTENT_URI_WISHLIST : FunkoContentProvider.CONTENT_URI_OWNED;
+            getActivity().getContentResolver().insert(contentUri, newPop.toContentValues());
 
             //toast
-            String toastText = "FunkoPop: " + newPop.getName() + " #" + newPop.getNumber() + " added to Database!";
+            String destination = isWishlist ? "Wishlist" : "Collection";
+            String toastText = "FunkoPop: " + newPop.getName() + " #" + newPop.getNumber() + " added to " + destination + "!";
             Toast.makeText(getContext(), toastText, Toast.LENGTH_LONG).show();
 
             //clear the form
             editTextName.setText("");
             editTextNumber.setText("");
+            checkBoxWishlist.setChecked(false);
             imageViewPreview.setImageURI(null);
             imageViewPreview.setVisibility(View.GONE); // Hide the image again
             selectedImageUri = null;

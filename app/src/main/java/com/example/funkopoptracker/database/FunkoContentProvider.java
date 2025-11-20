@@ -66,7 +66,7 @@ public class FunkoContentProvider extends ContentProvider {
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 5);
+            super(context, DB_NAME, null, 6);
         }
 
         @Override
@@ -109,6 +109,30 @@ public class FunkoContentProvider extends ContentProvider {
                     //already uppercase or doesn't exist
                 }
             }
+            if (oldVersion < 6) {
+                //add rarity column and populate it based on existing prices
+                db.execSQL("ALTER TABLE " + TABLE_OWNED + " ADD COLUMN " + COL_RARITY + " INTEGER DEFAULT 0");
+                db.execSQL("ALTER TABLE " + TABLE_WISHLIST + " ADD COLUMN " + COL_RARITY + " INTEGER DEFAULT 0");
+
+                //regenerate rarity values based on existing prices
+                updateRarityFromPrice(db, TABLE_OWNED);
+                updateRarityFromPrice(db, TABLE_WISHLIST);
+            }
+        }
+
+        private void updateRarityFromPrice(SQLiteDatabase db, String tableName) {
+            Cursor cursor = db.query(tableName, null, null, null, null, null, null);
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PRICE));
+
+                int rarity = RandomPriceGenerator.calculateRarity(price);
+
+                ContentValues values = new ContentValues();
+                values.put(COL_RARITY, rarity);
+                db.update(tableName, values, "_id=" + id, null);
+            }
+            cursor.close();
         }
 
         private void regeneratePrices(SQLiteDatabase db, String tableName) {

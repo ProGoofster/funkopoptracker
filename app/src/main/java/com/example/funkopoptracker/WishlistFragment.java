@@ -43,7 +43,7 @@ public class WishlistFragment extends Fragment {
                 android.widget.TextView popNumberText = view.findViewById(android.R.id.text2);
                 FunkoPop funkoPop = getItem(position);
                 popNameText.setText(funkoPop.getName());
-                popNumberText.setText(funkoPop.getNumber());
+                popNumberText.setText(funkoPop.getNumberString());
                 return view;
             }
         };
