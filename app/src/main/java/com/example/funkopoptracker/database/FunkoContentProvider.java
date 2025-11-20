@@ -24,10 +24,10 @@ public class FunkoContentProvider extends ContentProvider {
     public static final String COL_NUMBER = "NUMBER";
     public static final String COL_RARITY = "RARITY";
     public static final String COL_PICTURE = "PICTURE";
+    public static final String COL_PRICE = "PRICE";
 
     // price history columns
     public static final String COL_FUNKO_ID = "funko_id";
-    public static final String COL_PRICE = "price";
     public static final String COL_TIMESTAMP = "timestamp";
 
     // SQL Create statements
@@ -66,7 +66,7 @@ public class FunkoContentProvider extends ContentProvider {
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 4);
+            super(context, DB_NAME, null, 5);
         }
 
         @Override
@@ -95,6 +95,19 @@ public class FunkoContentProvider extends ContentProvider {
                 //generate prices for existing pops
                 regeneratePrices(db, TABLE_OWNED);
                 regeneratePrices(db, TABLE_WISHLIST);
+            }
+            if (oldVersion < 5) {
+                //fix column name case from goofster's version
+                try {
+                    db.execSQL("ALTER TABLE " + TABLE_OWNED + " RENAME COLUMN price TO PRICE");
+                } catch (Exception e) {
+                    //already uppercase or doesn't exist
+                }
+                try {
+                    db.execSQL("ALTER TABLE " + TABLE_WISHLIST + " RENAME COLUMN price TO PRICE");
+                } catch (Exception e) {
+                    //already uppercase or doesn't exist
+                }
             }
         }
 

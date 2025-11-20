@@ -70,6 +70,7 @@ public class FunkoPop {
     public int getNumber() {
         return number;
     }
+
     public String getNumberString() {
         return "#" + number;
     }
