@@ -66,7 +66,7 @@ public class FunkoContentProvider extends ContentProvider {
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 6);
+            super(context, DB_NAME, null, 5);
         }
 
         @Override
@@ -108,15 +108,6 @@ public class FunkoContentProvider extends ContentProvider {
                 } catch (Exception e) {
                     //already uppercase or doesn't exist
                 }
-            }
-            if (oldVersion < 6) {
-                //add rarity column and populate it based on existing prices
-                db.execSQL("ALTER TABLE " + TABLE_OWNED + " ADD COLUMN " + COL_RARITY + " INTEGER DEFAULT 0");
-                db.execSQL("ALTER TABLE " + TABLE_WISHLIST + " ADD COLUMN " + COL_RARITY + " INTEGER DEFAULT 0");
-
-                //regenerate rarity values based on existing prices
-                updateRarityFromPrice(db, TABLE_OWNED);
-                updateRarityFromPrice(db, TABLE_WISHLIST);
             }
         }
 
