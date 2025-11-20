@@ -9,17 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Total Value: $0"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:textColor="@color/black"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:text="PLACEHOLDER - API data goes here"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textColor="@color/black"/>
 
     <ListView
         android:id="@+id/valueListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:textColor="@color/black"/>
 
 </LinearLayout>

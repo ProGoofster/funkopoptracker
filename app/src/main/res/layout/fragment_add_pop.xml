@@ -13,14 +13,16 @@
             android:id="@+id/editTextName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name" />
+            android:hint="Name"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/editTextNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Number"
-            android:inputType="number" />
+            android:inputType="number"
+            android:textColor="@color/black"/>
 
         <CheckBox
             android:id="@+id/checkBoxWishlist"
@@ -29,7 +31,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="Add to Wishlist"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -38,7 +41,8 @@
             android:layout_marginBottom="8dp"
             android:text="Funko Pop Image:"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
 
         <ImageView
             android:id="@+id/imageViewPreview"
