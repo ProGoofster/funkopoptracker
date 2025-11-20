@@ -29,10 +29,11 @@ public class ValueFragment extends Fragment {
         Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_OWNED, null, null, null, null);
         funkoPops.addAll(FunkoPop.allFromCursor(cursor));
 
-        int totalValue = funkoPops.size() * 50;//debug - all values set to 50 rn
+        double totalValue = 0;
+        for (FunkoPop pop : funkoPops) {
+            totalValue += pop.getPrice();
+        }
         totalValueText.setText("Total Value: $" + totalValue);
-
-
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
@@ -48,7 +49,7 @@ public class ValueFragment extends Fragment {
                 android.widget.TextView popNumberText = view.findViewById(android.R.id.text2);
                 FunkoPop funkoPop = getItem(position);
                 popNameText.setText(funkoPop.getName());
-                popNumberText.setText(funkoPop.getNumber() + " - $50");
+                popNumberText.setText(funkoPop.getNumber() + " - $" + funkoPop.getPrice());
                 return view;
             }
         };

@@ -16,6 +16,7 @@ public class FunkoContentProvider extends ContentProvider {
     // Table names
     public static final String TABLE_OWNED = "funkoOwnedTable";
     public static final String TABLE_WISHLIST = "funkoWishlistTable";
+    public static final String TABLE_PRICE_HISTORY = "price_history";
     public static final String DB_NAME = "funkoDB";
 
     // Column names (same for both tables)
@@ -24,13 +25,19 @@ public class FunkoContentProvider extends ContentProvider {
     public static final String COL_RARITY = "RARITY";
     public static final String COL_PICTURE = "PICTURE";
 
+    // price history columns
+    public static final String COL_FUNKO_ID = "funko_id";
+    public static final String COL_PRICE = "price";
+    public static final String COL_TIMESTAMP = "timestamp";
+
     // SQL Create statements
     public final static String SQL_CREATE_OWNED = "CREATE TABLE " + TABLE_OWNED + " (" +
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COL_NAME + " TEXT, " +
             COL_NUMBER + " INTEGER, " +
             COL_RARITY + " INTEGER, " +
-            COL_PICTURE + " TEXT " +
+            COL_PICTURE + " TEXT, " +
+            COL_PRICE + " REAL " +
             ")";
 
     public final static String SQL_CREATE_WISHLIST = "CREATE TABLE " + TABLE_WISHLIST + " (" +
@@ -38,25 +45,35 @@ public class FunkoContentProvider extends ContentProvider {
             COL_NAME + " TEXT, " +
             COL_NUMBER + " INTEGER, " +
             COL_RARITY + " INTEGER, " +
-            COL_PICTURE + " TEXT " +
+            COL_PICTURE + " TEXT, " +
+            COL_PRICE + " REAL " +
+            ")";
+
+    public final static String SQL_CREATE_PRICE_HISTORY = "CREATE TABLE " + TABLE_PRICE_HISTORY + " (" +
+            "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COL_FUNKO_ID + " INTEGER, " +
+            COL_PRICE + " REAL, " +
+            COL_TIMESTAMP + " INTEGER " +
             ")";
 
     // Separate URIs for each table
     public static final Uri CONTENT_URI_OWNED = Uri.parse("content://com.example.funkotracker.provider/owned");
     public static final Uri CONTENT_URI_WISHLIST = Uri.parse("content://com.example.funkotracker.provider/wishlist");
+    public static final Uri CONTENT_URI_PRICE_HISTORY = Uri.parse("content://com.example.funkotracker.provider/price_history");
 
     MainDatabaseHelper mHelper;
 
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 2); // Increment version to 2
+            super(context, DB_NAME, null, 4);
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(SQL_CREATE_OWNED);
             db.execSQL(SQL_CREATE_WISHLIST);
+            db.execSQL(SQL_CREATE_PRICE_HISTORY);
         }
 
         @Override
@@ -67,6 +84,36 @@ public class FunkoContentProvider extends ContentProvider {
                 // Create new wishlist table
                 db.execSQL(SQL_CREATE_WISHLIST);
             }
+            if (oldVersion < 3) {
+                db.execSQL(SQL_CREATE_PRICE_HISTORY);
+            }
+            if (oldVersion < 4) {
+                //add price column
+                db.execSQL("ALTER TABLE " + TABLE_OWNED + " ADD COLUMN " + COL_PRICE + " REAL DEFAULT 0");
+                db.execSQL("ALTER TABLE " + TABLE_WISHLIST + " ADD COLUMN " + COL_PRICE + " REAL DEFAULT 0");
+
+                //generate prices for existing pops
+                regeneratePrices(db, TABLE_OWNED);
+                regeneratePrices(db, TABLE_WISHLIST);
+            }
+        }
+
+        private void regeneratePrices(SQLiteDatabase db, String tableName) {
+            Cursor cursor = db.query(tableName, null, null, null, null, null, null);
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(COL_NAME));
+                int number = cursor.getInt(cursor.getColumnIndexOrThrow(COL_NUMBER));
+
+                double price = RandomPriceGenerator.generatePrice(name, number);
+                int rarity = RandomPriceGenerator.calculateRarity(price);
+
+                ContentValues values = new ContentValues();
+                values.put(COL_PRICE, price);
+                values.put(COL_RARITY, rarity);
+                db.update(tableName, values, "_id=" + id, null);
+            }
+            cursor.close();
         }
     }
 
@@ -74,6 +121,8 @@ public class FunkoContentProvider extends ContentProvider {
         String path = uri.getPath();
         if (path.contains("wishlist")) {
             return TABLE_WISHLIST;
+        } else if (path.contains("price_history")) {
+            return TABLE_PRICE_HISTORY;
         } else if (path.contains("owned")) {
             return TABLE_OWNED;
         }

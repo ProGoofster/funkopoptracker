@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.example.funkopoptracker.database.FunkoContentProvider;
+import com.example.funkopoptracker.database.RandomPriceGenerator;
 
 public class AddPopFragment extends Fragment {
 
@@ -29,13 +30,16 @@ public class AddPopFragment extends Fragment {
             String numberText = editTextNumber.getText().toString();
             int number = Integer.parseInt(numberText);
 
-            FunkoPop newPop = new FunkoPop(name, number);
+            double price = RandomPriceGenerator.generatePrice(name, number);
+            int rarity = RandomPriceGenerator.calculateRarity(price);
+
+            FunkoPop newPop = new FunkoPop(name, number, rarity, null, price);
 
             //database stuff would happen here to save newPop
             getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_OWNED, newPop.toContentValues());
 
             //toast
-            String toastText = "FunkoPop: " + newPop.getName() + ", " + newPop.getNumber() + " added to DataBase (not really).";
+            String toastText = "FunkoPop: " + newPop.getName() + ", " + newPop.getNumber() + " added to DataBase.";
             Toast.makeText(getContext(), toastText, Toast.LENGTH_LONG).show();
 
             //clear the form

@@ -13,19 +13,22 @@ public class FunkoPop {
     private final int number;
     private final int rarity;
     private final String picture;
+    private final double price;
 
     public FunkoPop(String name, int number) {
         this.name = name;
         this.number = number;
         rarity = 0;
         picture = null;
+        price = 0.0;
     }
 
-    public FunkoPop(String name, int number, int rarity, String picture) {
+    public FunkoPop(String name, int number, int rarity, String picture, double price) {
         this.name = name;
         this.number = number;
         this.rarity = rarity;
         this.picture = picture;
+        this.price = price;
     }
 
     public ContentValues toContentValues() {
@@ -34,6 +37,7 @@ public class FunkoPop {
         values.put(FunkoContentProvider.COL_NUMBER, number);
         values.put(FunkoContentProvider.COL_RARITY, rarity);
         values.put(FunkoContentProvider.COL_PICTURE, picture);
+        values.put(FunkoContentProvider.COL_PRICE, price);
         return values;
     }
 
@@ -42,8 +46,9 @@ public class FunkoPop {
         int number = cursor.getInt(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_NUMBER));
         int rarity = cursor.getInt(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_RARITY));
         String picture = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_PICTURE));
+        double price = cursor.getDouble(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_PRICE));
 
-        return new FunkoPop(name, number, rarity, picture);
+        return new FunkoPop(name, number, rarity, picture, price);
     }
 
     public static List<FunkoPop> allFromCursor(Cursor cursor) {
@@ -75,5 +80,9 @@ public class FunkoPop {
 
     public String getPicture() {
         return picture;
+    }
+
+    public double getPrice() {
+        return price;
     }
 }
