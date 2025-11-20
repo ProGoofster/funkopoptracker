@@ -66,7 +66,7 @@ public class FunkoContentProvider extends ContentProvider {
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 5);
+            super(context, DB_NAME, null, 6);
         }
 
         @Override
@@ -78,70 +78,12 @@ public class FunkoContentProvider extends ContentProvider {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if (oldVersion < 2) {
-                // Rename old table to owned table
-                db.execSQL("ALTER TABLE funkoTable RENAME TO " + TABLE_OWNED);
-                // Create new wishlist table
-                db.execSQL(SQL_CREATE_WISHLIST);
-            }
-            if (oldVersion < 3) {
-                db.execSQL(SQL_CREATE_PRICE_HISTORY);
-            }
-            if (oldVersion < 4) {
-                //add price column
-                db.execSQL("ALTER TABLE " + TABLE_OWNED + " ADD COLUMN " + COL_PRICE + " REAL DEFAULT 0");
-                db.execSQL("ALTER TABLE " + TABLE_WISHLIST + " ADD COLUMN " + COL_PRICE + " REAL DEFAULT 0");
-
-                //generate prices for existing pops
-                regeneratePrices(db, TABLE_OWNED);
-                regeneratePrices(db, TABLE_WISHLIST);
-            }
-            if (oldVersion < 5) {
-                //fix column name case from goofster's version
-                try {
-                    db.execSQL("ALTER TABLE " + TABLE_OWNED + " RENAME COLUMN price TO PRICE");
-                } catch (Exception e) {
-                    //already uppercase or doesn't exist
-                }
-                try {
-                    db.execSQL("ALTER TABLE " + TABLE_WISHLIST + " RENAME COLUMN price TO PRICE");
-                } catch (Exception e) {
-                    //already uppercase or doesn't exist
-                }
-            }
-        }
-
-        private void updateRarityFromPrice(SQLiteDatabase db, String tableName) {
-            Cursor cursor = db.query(tableName, null, null, null, null, null, null);
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-                double price = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PRICE));
-
-                int rarity = RandomPriceGenerator.calculateRarity(price);
-
-                ContentValues values = new ContentValues();
-                values.put(COL_RARITY, rarity);
-                db.update(tableName, values, "_id=" + id, null);
-            }
-            cursor.close();
-        }
-
-        private void regeneratePrices(SQLiteDatabase db, String tableName) {
-            Cursor cursor = db.query(tableName, null, null, null, null, null, null);
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(COL_NAME));
-                int number = cursor.getInt(cursor.getColumnIndexOrThrow(COL_NUMBER));
-
-                double price = RandomPriceGenerator.generatePrice(name, number);
-                int rarity = RandomPriceGenerator.calculateRarity(price);
-
-                ContentValues values = new ContentValues();
-                values.put(COL_PRICE, price);
-                values.put(COL_RARITY, rarity);
-                db.update(tableName, values, "_id=" + id, null);
-            }
-            cursor.close();
+            // Drop all existing tables and recreate with current schema
+            db.execSQL("DROP TABLE IF EXISTS funkoTable");
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_OWNED);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_WISHLIST);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRICE_HISTORY);
+            onCreate(db);
         }
     }
 
