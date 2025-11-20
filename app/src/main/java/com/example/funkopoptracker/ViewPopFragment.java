@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.funkopoptracker.database.FunkoContentProvider;
 
+import java.io.File;
+
 public class ViewPopFragment extends Fragment {
     private static final String ARG_NAME = "name";
     private static final String ARG_NUMBER = "number";
@@ -63,6 +65,14 @@ public class ViewPopFragment extends Fragment {
         //Setup delete button
         Button btnDelete = view.findViewById(R.id.btnDelete);
         btnDelete.setOnClickListener(v -> {
+            // Delete the image file if it exists
+            if (picture != null && !picture.isEmpty()) {
+                File imageFile = new File(picture);
+                if (imageFile.exists()) {
+                    imageFile.delete();
+                }
+            }
+
             // Delete the entry from the database using name and number as selection criteria
             String selection = FunkoContentProvider.COL_NAME + " = ? AND " + FunkoContentProvider.COL_NUMBER + " = ?";
             String[] selectionArgs = new String[]{name, String.valueOf(number)};
