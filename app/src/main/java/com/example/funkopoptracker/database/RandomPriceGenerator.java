@@ -63,4 +63,25 @@ public class RandomPriceGenerator {
         Random numberRandom = new Random(number);
         return 0.8 + (numberRandom.nextDouble() * 0.4);
     }
+
+    //generate new price based on previous price and day
+    public static double generatePriceDelta(double previousPrice, String name, int number, int day) {
+        long seed = createSeed(name, number) + day;
+        Random random = new Random(seed);
+
+        double roll = random.nextDouble();
+        double change;
+
+        if (roll < 0.01) {
+            change = 0.20 + (random.nextDouble() * 0.30); //20% - 50%, 1% of the time
+        } else {
+            change = 0.01 + (random.nextDouble() * 0.04);//1% - 5%, 99% of the time
+        }
+
+        if (random.nextBoolean()) { //coin flip for neg/pos
+            return Math.max(previousPrice * (1.0 + change), 0.67); //0.67 is lower bound for pop price3
+        } else {
+            return Math.max(previousPrice * (1.0 - change), 0.67);
+        }
+    }
 }

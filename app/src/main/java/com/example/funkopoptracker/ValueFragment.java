@@ -1,39 +1,118 @@
 package com.example.funkopoptracker;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.funkopoptracker.database.FunkoContentProvider;
+import com.example.funkopoptracker.database.RandomPriceGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ValueFragment extends Fragment {
 
+    private TextView totalValueText;
+    private TextView dayText;
+    private ListView listView;
+    private List<FunkoPop> funkoPops = new ArrayList<>();
+    private List<Double> prices = new ArrayList<>();
+    private int currentDay = 0;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_value, container, false);
 
-        TextView totalValueText = view.findViewById(R.id.totalValueText);
-        ListView listView = view.findViewById(R.id.valueListView);
+        totalValueText = view.findViewById(R.id.totalValueText);
+        dayText = view.findViewById(R.id.dayText);
+        listView = view.findViewById(R.id.valueListView);
+        Button advanceDayButton = view.findViewById(R.id.advanceDayButton);
 
-        List<FunkoPop> funkoPops = new ArrayList<>();
-
+        //load pops from db
         Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_OWNED, null, null, null, null);
         funkoPops.addAll(FunkoPop.allFromCursor(cursor));
 
-        double totalValue = 0;
-        for (FunkoPop pop : funkoPops) {
-            totalValue += pop.getPrice();
+        //get current day from db
+        Cursor dayCursor = getActivity().getContentResolver().query(
+            FunkoContentProvider.CONTENT_URI_PRICE_HISTORY, new String[]{"MAX(timestamp)"}, null, null, null);
+        if (dayCursor.moveToFirst()) currentDay = dayCursor.getInt(0);
+        dayCursor.close();
+
+        loadPrices();
+        updateDisplay();
+
+
+
+        advanceDayButton.setOnClickListener(v -> advanceDay());
+
+        return view;
+    }
+
+    private void loadPrices() {
+        prices.clear();
+
+        for (int i = 0; i < funkoPops.size(); i++) {
+            FunkoPop pop = funkoPops.get(i);
+
+            if (currentDay == 0) {
+                prices.add(pop.getPrice());
+            } else {
+                //try to get from history
+                Cursor cursor = getActivity().getContentResolver().query(
+                    FunkoContentProvider.CONTENT_URI_PRICE_HISTORY, null,
+                    "funko_id = " + pop.getId() + " AND timestamp = " + currentDay, null, null);
+
+                if (cursor.moveToFirst()) {
+                    prices.add(cursor.getDouble(cursor.getColumnIndexOrThrow("PRICE")));
+                } else {
+                    prices.add(pop.getPrice());
+                }
+                cursor.close();
+            }
         }
-        totalValueText.setText("Total Value: $" + totalValue);
+    }
+
+    //updates all funko pops in collection with a new price based on generatePriceDelta().
+    private void advanceDay() {
+
+        currentDay++; //increment day
+
+        for (int i = 0; i < funkoPops.size(); i++) {
+            FunkoPop pop = funkoPops.get(i);
+            double previousPrice = prices.get(i);
+
+            //generates new price + pricedelta
+            double newPrice = RandomPriceGenerator.generatePriceDelta(previousPrice, pop.getName(), pop.getNumber(), currentDay);
+
+            //save to history
+            ContentValues values = new ContentValues();
+            values.put("funko_id", pop.getId());
+            values.put("PRICE", newPrice);
+            values.put("timestamp", currentDay);
+            getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_PRICE_HISTORY, values);
+
+            prices.set(i, newPrice);
+        }
+
+        updateDisplay();
+    }
+
+    private void updateDisplay() {
+        dayText.setText("Day " + currentDay);
+
+        double totalValue = 0;
+        for (Double price : prices) {
+            totalValue += price;
+        }
+        totalValueText.setText("Total Value: $" + String.format("%.2f", totalValue));
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
@@ -44,18 +123,16 @@ public class ValueFragment extends Fragment {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-                //simple_list_item_2 has text1 for title and text2 for subtitle
-                android.widget.TextView popNameText = view.findViewById(android.R.id.text1);
-                android.widget.TextView popNumberText = view.findViewById(android.R.id.text2);
+                TextView popNameText = view.findViewById(android.R.id.text1);
+                TextView popNumberText = view.findViewById(android.R.id.text2);
                 FunkoPop funkoPop = getItem(position);
+                double price = prices.get(position);
                 popNameText.setText(funkoPop.getName());
-                popNumberText.setText(funkoPop.getNumber() + " - $" + funkoPop.getPrice());
+                popNumberText.setText(funkoPop.getNumber() + " - $" + String.format("%.2f", price));
                 return view;
             }
         };
 
         listView.setAdapter(adapter);
-
-        return view;
     }
 }

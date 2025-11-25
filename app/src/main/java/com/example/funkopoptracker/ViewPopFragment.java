@@ -105,7 +105,7 @@ public class ViewPopFragment extends Fragment {
         tvFunkoNumber.setText("#" + number);
         ratingBarRarity.setRating(rarity);
         tvRarityValue.setText("(" + rarity + ".0)");
-        tvCurrentValue.setText("$" + price);
+        tvCurrentValue.setText("$" + String.format("%.2f", price));
 
         // Load image from internal storage if available
         if (picture != null && !picture.isEmpty()) {

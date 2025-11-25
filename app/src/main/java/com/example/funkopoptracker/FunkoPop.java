@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FunkoPop {
+    private int id;
     private final String name;
     private final int number;
     private final int rarity;
@@ -42,13 +43,16 @@ public class FunkoPop {
     }
 
     public static FunkoPop fromCursor(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_NAME));
         int number = cursor.getInt(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_NUMBER));
         int rarity = cursor.getInt(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_RARITY));
         String picture = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_PICTURE));
         double price = cursor.getDouble(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_PRICE));
 
-        return new FunkoPop(name, number, rarity, picture, price);
+        FunkoPop pop = new FunkoPop(name, number, rarity, picture, price);
+        pop.id = id;
+        return pop;
     }
 
     public static List<FunkoPop> allFromCursor(Cursor cursor) {
@@ -85,5 +89,9 @@ public class FunkoPop {
 
     public double getPrice() {
         return price;
+    }
+
+    public int getId() {
+        return id;
     }
 }
