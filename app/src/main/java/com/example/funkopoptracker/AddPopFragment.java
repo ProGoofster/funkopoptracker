@@ -123,6 +123,8 @@ public class AddPopFragment extends Fragment {
             }
 
             double price = RandomPriceGenerator.generatePrice(name, number);
+            //rounds up before storing
+            price = Math.round(price * 100.0) / 100.0;
             int rarity = RandomPriceGenerator.calculateRarity(price);
 
             FunkoPop newPop = new FunkoPop(name, number, rarity, imagePath, price);
