@@ -1,5 +1,6 @@
 package com.example.funkopoptracker;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
 import androidx.fragment.app.Fragment;
 
 import com.example.funkopoptracker.database.FunkoContentProvider;
@@ -29,6 +32,15 @@ public class WishlistFragment extends Fragment {
 
         funkoPopsWishlist.addAll(FunkoPop.allFromCursor(cursor));
 
+        //Tells if wishlist is empty
+        TextView emptyText = view.findViewById(R.id.wishlistEmptyText);
+        if (funkoPopsWishlist.isEmpty()) {
+            emptyText.setVisibility(View.VISIBLE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+        }
+
+
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
             android.R.layout.simple_list_item_2,
@@ -49,6 +61,19 @@ public class WishlistFragment extends Fragment {
         };
 
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            FunkoPop clickedPop = funkoPopsWishlist.get(position);
+
+            ViewPopFragment fragment = ViewPopFragment.newInstance(clickedPop);
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         return view;
     }

@@ -3,4 +3,5 @@
     <string name="search">Search</string>
     <string name="back">back\n</string>
     <string name="funko_pop_image">funko_pop_image</string>
+    <string name="your_wishlist_is_empty">Your wishlist is empty</string>
 </resources>

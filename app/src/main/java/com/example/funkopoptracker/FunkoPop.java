@@ -5,10 +5,11 @@ import android.database.Cursor;
 
 import com.example.funkopoptracker.database.FunkoContentProvider;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FunkoPop {
+public class FunkoPop implements Serializable {
     private int id;
     private final String name;
     private final int number;
