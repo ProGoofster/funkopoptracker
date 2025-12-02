@@ -1,5 +1,6 @@
 package com.example.funkopoptracker;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ public class ViewPopFragment extends Fragment {
     private static final String ARG_PICTURE = "picture";
     private static final String ARG_PRICE = "price";
 
+    private int id;
     private String name;
     private int number;
     private int rarity;
@@ -31,6 +33,7 @@ public class ViewPopFragment extends Fragment {
     public static ViewPopFragment newInstance(FunkoPop funkoPop) {
         ViewPopFragment fragment = new ViewPopFragment();
         Bundle args = new Bundle();
+        args.putInt("id", funkoPop.getId());
         args.putString(ARG_NAME, funkoPop.getName());
         args.putInt(ARG_NUMBER, funkoPop.getNumber());
         args.putInt(ARG_RARITY, funkoPop.getRarity());
@@ -44,6 +47,7 @@ public class ViewPopFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            id = getArguments().getInt("id");
             name = getArguments().getString(ARG_NAME);
             number = getArguments().getInt(ARG_NUMBER);
             rarity = getArguments().getInt(ARG_RARITY);
@@ -90,6 +94,34 @@ public class ViewPopFragment extends Fragment {
             } else {
                 android.widget.Toast.makeText(getContext(), "Failed to delete", android.widget.Toast.LENGTH_SHORT).show();
             }
+        });
+
+        Button btnWishlist = view.findViewById(R.id.btnAddToWishlist);
+        btnWishlist.setOnClickListener(v -> {
+            //check if already in wishlist
+            Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_WISHLIST,
+                null, "NAME = ? AND NUMBER = ?", new String[]{name, String.valueOf(number)}, null);
+            if (cursor.getCount() > 0) {
+                cursor.close();
+                android.widget.Toast.makeText(getContext(), "Already in wishlist", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            cursor.close();
+
+            //kill old prices for pop
+            getActivity().getContentResolver().delete(FunkoContentProvider.CONTENT_URI_PRICE_HISTORY,
+                "funko_id = " + id, null);
+
+            //kill pop in normal db
+            getActivity().getContentResolver().delete(FunkoContentProvider.CONTENT_URI_OWNED,
+                "NAME = ? AND NUMBER = ?", new String[]{name, String.valueOf(number)});
+
+            //add to wishlist
+            FunkoPop pop = new FunkoPop(name, number, rarity, picture, price);
+            getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_WISHLIST, pop.toContentValues());
+
+            android.widget.Toast.makeText(getContext(), "Added to wishlist", android.widget.Toast.LENGTH_SHORT).show();
+            requireActivity().getSupportFragmentManager().popBackStack();
         });
 
         // Populate the views with data

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.funkopoptracker.database.FunkoContentProvider;
@@ -27,6 +28,14 @@ public class HomeFragment extends Fragment {
         Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_OWNED, null, null, null, null);
 
         funkoPops.addAll(FunkoPop.allFromCursor(cursor));
+
+        //show empty message if collection is empty
+        TextView emptyText = view.findViewById(R.id.collectionEmptyText);
+        if (funkoPops.isEmpty()) {
+            emptyText.setVisibility(View.VISIBLE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+        }
 
         ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
