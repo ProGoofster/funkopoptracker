@@ -15,6 +15,11 @@ import androidx.fragment.app.Fragment;
 import com.example.funkopoptracker.database.FunkoContentProvider;
 import com.example.funkopoptracker.database.RandomPriceGenerator;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +28,7 @@ public class ValueFragment extends Fragment {
     private TextView totalValueText;
     private TextView dayText;
     private ListView listView;
+    private LineChart chart;
     private List<FunkoPop> funkoPops = new ArrayList<>();
     private List<Double> prices = new ArrayList<>();
     private int currentDay = 0;
@@ -34,6 +40,7 @@ public class ValueFragment extends Fragment {
         totalValueText = view.findViewById(R.id.totalValueText);
         dayText = view.findViewById(R.id.dayText);
         listView = view.findViewById(R.id.valueListView);
+        chart = view.findViewById(R.id.priceChart);
         Button advanceDayButton = view.findViewById(R.id.advanceDayButton);
 
         //load pops from db
@@ -51,7 +58,9 @@ public class ValueFragment extends Fragment {
 
 
 
-        advanceDayButton.setOnClickListener(v -> advanceDay());
+        advanceDayButton.setOnClickListener(v -> {
+            if (!funkoPops.isEmpty()) advanceDay();
+        });
 
         return view;
     }
@@ -134,5 +143,32 @@ public class ValueFragment extends Fragment {
         };
 
         listView.setAdapter(adapter);
+        updateChart();
+    }
+
+    private void updateChart() {
+        List<Entry> entries = new ArrayList<>();
+
+        //day 0 = sum of base prices
+        double day0Total = 0;
+        for (FunkoPop pop : funkoPops) {
+            day0Total += pop.getPrice();
+        }
+        entries.add(new Entry(0, (float) day0Total));
+
+        //days 1 to currentDay from price_history
+        for (int day = 1; day <= currentDay; day++) {
+            Cursor cursor = getActivity().getContentResolver().query(
+                FunkoContentProvider.CONTENT_URI_PRICE_HISTORY, new String[]{"SUM(PRICE)"},
+                "timestamp = " + day, null, null);
+            if (cursor.moveToFirst()) {
+                entries.add(new Entry(day, cursor.getFloat(0)));
+            }
+            cursor.close();
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Total Value");
+        chart.setData(new LineData(dataSet));
+        chart.invalidate();
     }
 }

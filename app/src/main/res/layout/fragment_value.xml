@@ -36,6 +36,11 @@
 
     </LinearLayout>
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/priceChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+
     <ListView
         android:id="@+id/valueListView"
         android:layout_width="match_parent"
