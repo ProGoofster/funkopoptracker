@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -19,33 +20,35 @@ import java.util.List;
 
 public class WishlistFragment extends Fragment {
 
+    private List<FunkoPop> allFunkoPops = new ArrayList<>();
+    private List<FunkoPop> filteredFunkoPops = new ArrayList<>();
+    private ArrayAdapter<FunkoPop> adapter;
+    private TextView emptyText;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_wishlist, container, false);
 
         ListView listView = view.findViewById(R.id.wishlistListView);
+        SearchView searchView = view.findViewById(R.id.searchView);
+        emptyText = view.findViewById(R.id.wishlistEmptyText);
 
-
-        List<FunkoPop> funkoPopsWishlist = new ArrayList<>();
+        // Clear lists to prevent duplication when returning from back stack
+        allFunkoPops.clear();
+        filteredFunkoPops.clear();
 
         Cursor cursor = getActivity().getContentResolver().query(FunkoContentProvider.CONTENT_URI_WISHLIST, null, null, null, null);
 
-        funkoPopsWishlist.addAll(FunkoPop.allFromCursor(cursor));
+        allFunkoPops.addAll(FunkoPop.allFromCursor(cursor));
+        filteredFunkoPops.addAll(allFunkoPops);
 
-        //Tells if wishlist is empty
-        TextView emptyText = view.findViewById(R.id.wishlistEmptyText);
-        if (funkoPopsWishlist.isEmpty()) {
-            emptyText.setVisibility(View.VISIBLE);
-        } else {
-            emptyText.setVisibility(View.GONE);
-        }
+        updateEmptyTextVisibility();
 
-
-        ArrayAdapter<FunkoPop> adapter = new ArrayAdapter<FunkoPop>(
+        adapter = new ArrayAdapter<FunkoPop>(
             getContext(),
             android.R.layout.simple_list_item_2,
             android.R.id.text1,
-                funkoPopsWishlist
+            filteredFunkoPops
         ) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -63,7 +66,7 @@ public class WishlistFragment extends Fragment {
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((parent, view1, position, id) -> {
-            FunkoPop clickedPop = funkoPopsWishlist.get(position);
+            FunkoPop clickedPop = filteredFunkoPops.get(position);
 
             ViewPopFragment fragment = ViewPopFragment.newInstance(clickedPop);
 
@@ -75,6 +78,48 @@ public class WishlistFragment extends Fragment {
                     .commit();
         });
 
+        // Set up search functionality
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterFunkoPops(newText);
+                return true;
+            }
+        });
+
         return view;
+    }
+
+    private void filterFunkoPops(String query) {
+        filteredFunkoPops.clear();
+
+        if (query == null || query.trim().isEmpty()) {
+            filteredFunkoPops.addAll(allFunkoPops);
+        } else {
+            String lowerCaseQuery = query.toLowerCase().trim();
+            for (FunkoPop funkoPop : allFunkoPops) {
+                // Search by name or number
+                if (funkoPop.getName().toLowerCase().contains(lowerCaseQuery) ||
+                    funkoPop.getNumberString().toLowerCase().contains(lowerCaseQuery)) {
+                    filteredFunkoPops.add(funkoPop);
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+        updateEmptyTextVisibility();
+    }
+
+    private void updateEmptyTextVisibility() {
+        if (filteredFunkoPops.isEmpty()) {
+            emptyText.setVisibility(View.VISIBLE);
+        } else {
+            emptyText.setVisibility(View.GONE);
+        }
     }
 }

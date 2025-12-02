@@ -9,13 +9,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!--Search Bar -->
+    <!--Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/searchToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#B8B4B4"
-        app:menu="@menu/search_menu"
         app:title="My Funko Collection"
         app:titleTextColor="@color/black" />
 

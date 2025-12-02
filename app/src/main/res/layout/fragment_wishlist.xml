@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:queryHint="Search by name or number"
+        android:iconifiedByDefault="false"
+        android:background="#E0E0E0"
+        android:padding="8dp"/>
+
     <TextView
         android:id="@+id/wishlistEmptyText"
         android:layout_width="match_parent"
