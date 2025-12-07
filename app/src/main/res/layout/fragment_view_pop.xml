@@ -36,8 +36,7 @@
                 android:text="Funko Pop Details"
                 android:textColor="@color/black"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold" />
         </RelativeLayout>
 
         <!-- Funko Pop Image -->
@@ -77,6 +76,7 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Name - View Mode -->
                 <TextView
                     android:id="@+id/tvFunkoName"
                     android:layout_width="match_parent"
@@ -86,6 +86,20 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
+                <!-- Name - Edit Mode -->
+                <EditText
+                    android:id="@+id/editFunkoName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Funko Pop Name"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="8dp"
+                    android:visibility="gone" />
+
+                <!-- Number - View Mode -->
                 <TextView
                     android:id="@+id/tvFunkoNumber"
                     android:layout_width="match_parent"
@@ -94,6 +108,20 @@
                     android:text="#000"
                     android:textColor="#6D738C"
                     android:textSize="18sp" />
+
+                <!-- Number - Edit Mode -->
+                <EditText
+                    android:id="@+id/editFunkoNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="000"
+                    android:textColor="#6D738C"
+                    android:textSize="18sp"
+                    android:inputType="number"
+                    android:background="@android:drawable/edit_text"
+                    android:padding="8dp"
+                    android:visibility="gone" />
 
                 <!-- Rarity Rating -->
                 <LinearLayout
@@ -248,6 +276,7 @@
                         android:textColor="#6D738C"
                         android:textSize="14sp" />
 
+                    <!-- Condition - View Mode -->
                     <TextView
                         android:id="@+id/tvCondition"
                         android:layout_width="0dp"
@@ -256,6 +285,14 @@
                         android:text="Mint"
                         android:textColor="@color/black"
                         android:textSize="14sp" />
+
+                    <!-- Condition - Edit Mode -->
+                    <Spinner
+                        android:id="@+id/spinnerCondition"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:visibility="gone" />
                 </LinearLayout>
 
                 <!-- Notes -->
@@ -268,6 +305,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp" />
 
+                <!-- Notes - View Mode -->
                 <TextView
                     android:id="@+id/tvNotes"
                     android:layout_width="match_parent"
@@ -278,6 +316,21 @@
                     android:minHeight="60dp"
                     android:padding="8dp"
                     android:background="#F0F0F0" />
+
+                <!-- Notes - Edit Mode -->
+                <EditText
+                    android:id="@+id/editNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:text=""
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:gravity="top|start"
+                    android:padding="8dp"
+                    android:background="@android:drawable/edit_text"
+                    android:inputType="textMultiLine"
+                    android:hint="Add notes here..."
+                    android:visibility="gone" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

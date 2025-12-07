@@ -11,11 +11,13 @@ import java.util.List;
 
 public class FunkoPop implements Serializable {
     private int id;
-    private final String name;
-    private final int number;
+    private String name;
+    private int number;
     private final int rarity;
     private final String picture;
     private final double price;
+    private String condition;
+    private String notes;
 
     public FunkoPop(String name, int number) {
         this.name = name;
@@ -23,6 +25,8 @@ public class FunkoPop implements Serializable {
         rarity = 0;
         picture = null;
         price = 0.0;
+        this.condition = "Mint";
+        this.notes = "";
     }
 
     public FunkoPop(String name, int number, int rarity, String picture, double price) {
@@ -31,6 +35,18 @@ public class FunkoPop implements Serializable {
         this.rarity = rarity;
         this.picture = picture;
         this.price = price;
+        this.condition = "Mint";
+        this.notes = "";
+    }
+
+    public FunkoPop(String name, int number, int rarity, String picture, double price, String condition, String notes) {
+        this.name = name;
+        this.number = number;
+        this.rarity = rarity;
+        this.picture = picture;
+        this.price = price;
+        this.condition = condition != null ? condition : "Mint";
+        this.notes = notes != null ? notes : "";
     }
 
     public ContentValues toContentValues() {
@@ -40,6 +56,8 @@ public class FunkoPop implements Serializable {
         values.put(FunkoContentProvider.COL_RARITY, rarity);
         values.put(FunkoContentProvider.COL_PICTURE, picture);
         values.put(FunkoContentProvider.COL_PRICE, price);
+        values.put(FunkoContentProvider.COL_CONDITION, condition);
+        values.put(FunkoContentProvider.COL_NOTES, notes);
         return values;
     }
 
@@ -51,7 +69,17 @@ public class FunkoPop implements Serializable {
         String picture = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_PICTURE));
         double price = cursor.getDouble(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_PRICE));
 
-        FunkoPop pop = new FunkoPop(name, number, rarity, picture, price);
+        //Handles conditions and notes (for edit button implementation)
+        String condition = "Mint";
+        String notes = "";
+        try{
+            condition = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_CONDITION));
+            notes = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_NOTES));
+        } catch (Exception e) {
+            //not implemented yet
+        }
+
+        FunkoPop pop = new FunkoPop(name, number, rarity, picture, price, condition, notes);
         pop.id = id;
         return pop;
     }
@@ -94,5 +122,27 @@ public class FunkoPop implements Serializable {
 
     public int getId() {
         return id;
+    }
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+    public String getCondition() {
+        return condition != null ? condition : "Mint";
+    }
+
+    public String getNotes() {
+        return notes != null ? notes : "";
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 }
