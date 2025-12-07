@@ -68,7 +68,7 @@ public class WishlistFragment extends Fragment {
         listView.setOnItemClickListener((parent, view1, position, id) -> {
             FunkoPop clickedPop = filteredFunkoPops.get(position);
 
-            ViewPopFragment fragment = ViewPopFragment.newInstance(clickedPop);
+            WishlistViewPopFragment fragment = WishlistViewPopFragment.newInstance(clickedPop);
 
             requireActivity()
                     .getSupportFragmentManager()
