@@ -189,7 +189,7 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Purchase Date -->
+                <!-- Date Created -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -199,12 +199,12 @@
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:text="Purchase Date:"
+                        android:text="Date Created:"
                         android:textColor="#6D738C"
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/tvPurchaseDate"
+                        android:id="@+id/tvDateAdded"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -213,7 +213,7 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <!-- Purchase Price -->
+                <!-- Original Price -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -223,12 +223,12 @@
                     <TextView
                         android:layout_width="120dp"
                         android:layout_height="wrap_content"
-                        android:text="Purchase Price:"
+                        android:text="Original Price:"
                         android:textColor="#6D738C"
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/tvPurchasePrice"
+                        android:id="@+id/tvOriginalPrice"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

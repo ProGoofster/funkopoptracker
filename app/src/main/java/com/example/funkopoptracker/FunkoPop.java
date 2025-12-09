@@ -18,6 +18,8 @@ public class FunkoPop implements Serializable {
     private final double price;
     private String condition;
     private String notes;
+    private long dateAdded;
+    private double originalPrice;
 
     public FunkoPop(String name, int number) {
         this.name = name;
@@ -27,6 +29,8 @@ public class FunkoPop implements Serializable {
         price = 0.0;
         this.condition = "Mint";
         this.notes = "";
+        this.dateAdded = System.currentTimeMillis();
+        this.originalPrice = 0.0;
     }
 
     public FunkoPop(String name, int number, int rarity, String picture, double price) {
@@ -37,6 +41,8 @@ public class FunkoPop implements Serializable {
         this.price = price;
         this.condition = "Mint";
         this.notes = "";
+        this.dateAdded = System.currentTimeMillis();
+        this.originalPrice = price;
     }
 
     public FunkoPop(String name, int number, int rarity, String picture, double price, String condition, String notes) {
@@ -47,6 +53,8 @@ public class FunkoPop implements Serializable {
         this.price = price;
         this.condition = condition != null ? condition : "Mint";
         this.notes = notes != null ? notes : "";
+        this.dateAdded = System.currentTimeMillis();
+        this.originalPrice = price;
     }
 
     public ContentValues toContentValues() {
@@ -58,6 +66,8 @@ public class FunkoPop implements Serializable {
         values.put(FunkoContentProvider.COL_PRICE, price);
         values.put(FunkoContentProvider.COL_CONDITION, condition);
         values.put(FunkoContentProvider.COL_NOTES, notes);
+        values.put(FunkoContentProvider.COL_DATE_ADDED, dateAdded);
+        values.put(FunkoContentProvider.COL_ORIGINAL_PRICE, originalPrice);
         return values;
     }
 
@@ -72,15 +82,21 @@ public class FunkoPop implements Serializable {
         //Handles conditions and notes (for edit button implementation)
         String condition = "Mint";
         String notes = "";
+        long dateAdded = 0;
+        double originalPrice = price;
         try{
             condition = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_CONDITION));
             notes = cursor.getString(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_NOTES));
+            dateAdded = cursor.getLong(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_DATE_ADDED));
+            originalPrice = cursor.getDouble(cursor.getColumnIndexOrThrow(FunkoContentProvider.COL_ORIGINAL_PRICE));
         } catch (Exception e) {
             //not implemented yet
         }
 
         FunkoPop pop = new FunkoPop(name, number, rarity, picture, price, condition, notes);
         pop.id = id;
+        pop.dateAdded = dateAdded;
+        pop.originalPrice = originalPrice;
         return pop;
     }
 
@@ -144,5 +160,13 @@ public class FunkoPop implements Serializable {
 
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    public long getDateAdded() {
+        return dateAdded;
+    }
+
+    public double getOriginalPrice() {
+        return originalPrice;
     }
 }

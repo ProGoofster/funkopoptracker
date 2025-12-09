@@ -27,6 +27,8 @@ public class FunkoContentProvider extends ContentProvider {
     public static final String COL_IS_WISHLIST = "IS_WISHLIST";
     public static final String COL_CONDITION = "CONDITION";
     public static final String COL_NOTES = "NOTES";
+    public static final String COL_DATE_ADDED = "DATE_ADDED";
+    public static final String COL_ORIGINAL_PRICE = "ORIGINAL_PRICE";
 
     // price history columns
     public static final String COL_FUNKO_ID = "funko_id";
@@ -42,7 +44,9 @@ public class FunkoContentProvider extends ContentProvider {
             COL_PRICE + " REAL, " +
             COL_IS_WISHLIST + " INTEGER DEFAULT 0 ," +
             COL_CONDITION + " TEXT DEFAULT 'Mint' , " +
-            COL_NOTES + " TEXT DEFAULT ''" +
+            COL_NOTES + " TEXT DEFAULT '' , " +
+            COL_DATE_ADDED + " INTEGER , " +
+            COL_ORIGINAL_PRICE + " REAL" +
             ")";
 
     public final static String SQL_CREATE_PRICE_HISTORY = "CREATE TABLE " + TABLE_PRICE_HISTORY + " (" +
@@ -62,7 +66,7 @@ public class FunkoContentProvider extends ContentProvider {
     protected final class MainDatabaseHelper extends SQLiteOpenHelper {
 
         public MainDatabaseHelper(Context context) {
-            super(context, DB_NAME, null, 8);
+            super(context, DB_NAME, null, 9);
         }
 
         @Override

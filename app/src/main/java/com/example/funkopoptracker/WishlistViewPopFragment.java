@@ -28,6 +28,8 @@ public class WishlistViewPopFragment extends Fragment {
     private static final String ARG_PRICE = "price";
     private static final String ARG_CONDITION = "condition";
     private static final String ARG_NOTES = "notes";
+    private static final String ARG_DATE_ADDED = "dateAdded";
+    private static final String ARG_ORIGINAL_PRICE = "originalPrice";
 
     private int id;
     private String name;
@@ -37,6 +39,8 @@ public class WishlistViewPopFragment extends Fragment {
     private double price;
     private String condition;
     private String notes;
+    private long dateAdded;
+    private double originalPrice;
 
     // UI elements - View mode
     private TextView tvFunkoName;
@@ -64,6 +68,8 @@ public class WishlistViewPopFragment extends Fragment {
         args.putDouble(ARG_PRICE, funkoPop.getPrice());
         args.putString(ARG_CONDITION, funkoPop.getCondition());
         args.putString(ARG_NOTES, funkoPop.getNotes());
+        args.putLong(ARG_DATE_ADDED, funkoPop.getDateAdded());
+        args.putDouble(ARG_ORIGINAL_PRICE, funkoPop.getOriginalPrice());
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,6 +86,8 @@ public class WishlistViewPopFragment extends Fragment {
             price = getArguments().getDouble(ARG_PRICE);
             condition = getArguments().getString(ARG_CONDITION, "Mint");
             notes = getArguments().getString(ARG_NOTES, "");
+            dateAdded = getArguments().getLong(ARG_DATE_ADDED, 0);
+            originalPrice = getArguments().getDouble(ARG_ORIGINAL_PRICE, price);
         }
     }
 
@@ -187,6 +195,16 @@ public class WishlistViewPopFragment extends Fragment {
         ratingBarRarity.setRating(rarity);
         tvRarityValue.setText("(" + rarity + ".0)");
         tvCurrentValue.setText("$" + String.format("%.2f", price));
+
+        //date added and original price
+        TextView tvDateAdded = view.findViewById(R.id.tvDateAdded);
+        TextView tvOriginalPrice = view.findViewById(R.id.tvOriginalPrice);
+        if (dateAdded > 0) {
+            tvDateAdded.setText(android.text.format.DateUtils.formatDateTime(getContext(), dateAdded, android.text.format.DateUtils.FORMAT_SHOW_DATE));
+        } else {
+            tvDateAdded.setText("N/A");
+        }
+        tvOriginalPrice.setText("$" + String.format("%.2f", originalPrice));
 
         // Load image from internal storage if available
         if (picture != null && !picture.isEmpty()) {

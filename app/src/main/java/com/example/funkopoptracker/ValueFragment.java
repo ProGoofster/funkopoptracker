@@ -108,6 +108,12 @@ public class ValueFragment extends Fragment {
             values.put("timestamp", currentDay);
             getActivity().getContentResolver().insert(FunkoContentProvider.CONTENT_URI_PRICE_HISTORY, values);
 
+            //update main table
+            ContentValues updateValues = new ContentValues();
+            updateValues.put(FunkoContentProvider.COL_PRICE, newPrice);
+            getActivity().getContentResolver().update(
+                FunkoContentProvider.CONTENT_URI_OWNED, updateValues, "_id = " + pop.getId(), null);
+
             prices.set(i, newPrice);
         }
 
